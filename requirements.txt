@@ -4,6 +4,7 @@ supabase
 python-dotenv
 paynow
 pydantic
+gunicorn
 
 # testing
 pytest

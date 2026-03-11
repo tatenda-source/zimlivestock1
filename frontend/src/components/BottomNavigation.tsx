@@ -1,12 +1,11 @@
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { 
-  Home, 
-  Plus, 
-  List, 
-  Bell, 
-  MessageCircle,
-  User
+import {
+  Home,
+  Plus,
+  List,
+  Bell,
+  Wallet,
 } from 'lucide-react';
 
 interface BottomNavigationProps {
@@ -48,10 +47,10 @@ export function BottomNavigation({
       count: notificationCount
     },
     {
-      id: 'messages',
-      label: 'Messages',
-      icon: MessageCircle,
-      count: messageCount
+      id: 'payments',
+      label: 'Payments',
+      icon: Wallet,
+      count: 0
     }
   ];
 
