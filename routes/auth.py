@@ -1,6 +1,9 @@
+import logging
 from flask import Blueprint, request, jsonify
 from db import supabase
 from middleware import require_auth, require_supabase
+
+logger = logging.getLogger(__name__)
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -30,7 +33,8 @@ def register():
             },
         })
         return jsonify(res.user), 201
-    except Exception:
+    except Exception as e:
+        logger.exception("Registration failed for email=%s", email)
         return jsonify({"detail": "Registration failed. Please try again."}), 400
 
 
@@ -51,7 +55,8 @@ def login():
             "token_type": "bearer",
             "user": res.user,
         }), 200
-    except Exception:
+    except Exception as e:
+        logger.exception("Login failed for contact=%s", data.get("contact"))
         return jsonify({"detail": "Invalid email or password"}), 401
 
 

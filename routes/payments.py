@@ -1,3 +1,4 @@
+import logging
 import uuid
 from datetime import datetime
 from flask import Blueprint, request, jsonify
@@ -9,6 +10,8 @@ from services import (
     initiate_web_payment,
     verify_paynow_webhook,
 )
+
+logger = logging.getLogger(__name__)
 
 payments_bp = Blueprint("payments", __name__, url_prefix="/payments")
 
@@ -92,8 +95,13 @@ def initiate_payment(current_user=None):
             }), 200
 
     except ValueError as e:
-        return jsonify({"detail": str(e)}), 400
-    except Exception:
+        logger.warning("Payment validation error for ref=%s: %s", reference, e)
+        return jsonify({"detail": "Payment could not be processed. Please check your details and try again."}), 400
+    except EnvironmentError as e:
+        logger.error("Paynow configuration error: %s", e)
+        return jsonify({"detail": "Payment service is not configured. Please contact support."}), 503
+    except Exception as e:
+        logger.exception("Payment initiation failed for ref=%s", reference)
         return jsonify({"detail": "Payment initiation failed"}), 500
 
 
@@ -177,7 +185,8 @@ def get_status(reference, current_user=None):
                     "merchant_reference", reference
                 ).execute()
                 payment["status"] = "paid"
-        except Exception:
+        except Exception as e:
+            logger.warning("Paynow status check failed for ref=%s: %s", reference, e)
             paynow_status_str = "check_failed"
 
     return jsonify({

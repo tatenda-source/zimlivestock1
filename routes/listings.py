@@ -1,6 +1,9 @@
+import logging
 from flask import Blueprint, request, jsonify
 from db import supabase
 from middleware import require_auth, require_supabase
+
+logger = logging.getLogger(__name__)
 
 listings_bp = Blueprint("listings", __name__, url_prefix="/livestock")
 
@@ -80,5 +83,6 @@ def create_listing(current_user=None):
     try:
         res = supabase.table("livestock_items").insert(insert_data).execute()
         return jsonify(res.data[0]), 201
-    except Exception:
+    except Exception as e:
+        logger.exception("Failed to create listing for user=%s", current_user.id)
         return jsonify({"detail": "Failed to create listing"}), 500

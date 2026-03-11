@@ -2,11 +2,14 @@
 Paynow payment service using the official Paynow Python SDK.
 SDK docs: https://developers.paynow.co.zw/docs/python_quickstart.html
 """
+import logging
 import os
 from paynow import Paynow
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 # ─── Initialise Paynow SDK ────────────────────────────────────────────────────
 
@@ -14,9 +17,7 @@ load_dotenv()
 integration_id = os.getenv("PAYNOW_INTEGRATION_ID", "")
 integration_key = os.getenv("PAYNOW_INTEGRATION_KEY", "")
 if not integration_id or not integration_key:
-    # don't raise yet – some parts of the app might import this file before
-    # .env is loaded, but at least print a message so developer notices.
-    print("[WARNING] Paynow credentials are not set. Payment operations will fail until PAYNOW_INTEGRATION_ID and PAYNOW_INTEGRATION_KEY are provided.")
+    logger.warning("Paynow credentials are not set. Payment operations will fail until PAYNOW_INTEGRATION_ID and PAYNOW_INTEGRATION_KEY are provided.")
 
 def _get_paynow() -> Paynow:
     """
@@ -177,5 +178,5 @@ def verify_paynow_webhook(data: dict) -> bool:
         # The Paynow SDK provides verify_hash(data) to check the signature
         return paynow.verify_hash(data)
     except Exception as e:
-        print(f"[ERROR] Paynow hash verification failed: {e}")
+        logger.error("Paynow hash verification failed: %s", e)
         return False

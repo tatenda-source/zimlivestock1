@@ -1,9 +1,17 @@
+import logging
 import os
 from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Configure structured logging
+log_level = logging.DEBUG if os.environ.get("DEBUG", "false").lower() == "true" else logging.INFO
+logging.basicConfig(
+    level=log_level,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
 
 app = Flask(__name__)
 

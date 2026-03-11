@@ -1,6 +1,9 @@
+import logging
 from flask import Blueprint, request, jsonify
 from db import supabase
 from middleware import require_auth, require_supabase
+
+logger = logging.getLogger(__name__)
 
 bids_bp = Blueprint("bids", __name__, url_prefix="/bids")
 
@@ -56,5 +59,6 @@ def place_bid(current_user=None):
             .execute()
         )
         return jsonify(res.data[0]), 201
-    except Exception:
+    except Exception as e:
+        logger.exception("Failed to place bid for user=%s on livestock=%s", current_user.id, livestock_id)
         return jsonify({"detail": "Failed to place bid"}), 500
